@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.dp
 fun ScaffoldComponent(modifier: Modifier, content: @Composable (Modifier) -> Unit) {
     Scaffold(
         modifier = modifier.padding(8.dp),
-
     ) { paddingValues ->
         content.invoke(Modifier.padding(paddingValues))
     }
