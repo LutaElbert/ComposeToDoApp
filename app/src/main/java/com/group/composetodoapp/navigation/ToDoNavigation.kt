@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.group.composetodoapp.homepage.Homepage
+import com.group.composetodoapp.screens.homepage.Homepage
 
 @Composable
 fun ToDoNavigation() {
