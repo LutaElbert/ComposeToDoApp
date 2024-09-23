@@ -22,7 +22,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import com.group.composetodoapp.R
 import com.group.composetodoapp.model.NavigationItem
 import kotlinx.coroutines.launch
 
@@ -73,7 +75,10 @@ fun NavigationDrawerHeader(drawerState: DrawerState) {
         items.forEachIndexed { index, item ->
             NavigationDrawerItem(
                 label = {
-                    Text(text = item.title)
+                    Text(
+                        text = item.title,
+                        color = colorResource(id = R.color.black500)
+                    )
                 },
                 selected = index == selectedItemIndex.intValue,
                 onClick = {
@@ -87,12 +92,16 @@ fun NavigationDrawerHeader(drawerState: DrawerState) {
                         imageVector = if (index == selectedItemIndex.intValue) {
                             item.selectedIcon
                         } else item.unselectedIcon,
-                        contentDescription = item.title
+                        contentDescription = item.title,
+                        tint = colorResource(id = R.color.brown500)
                     )
                 },
                 badge = {
                     item.badgeCount?.let {
-                        Text(text = item.badgeCount.toString())
+                        Text(
+                            text = item.badgeCount.toString(),
+                            color = colorResource(id = R.color.brown500)
+                        )
                     }
                 },
                 modifier = Modifier
