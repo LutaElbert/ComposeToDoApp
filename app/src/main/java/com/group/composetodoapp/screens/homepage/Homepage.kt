@@ -1,5 +1,14 @@
 package com.group.composetodoapp.screens.homepage
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateInt
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -19,10 +28,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.sharp.List
+import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.ViewModule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -106,6 +117,7 @@ fun MainContent(modifier: Modifier = Modifier) {
 @Composable
 private fun RowItem() {
     var isOverflowing by rememberSaveable { mutableStateOf(false) }
+    var isShowMoreClicked by rememberSaveable { mutableStateOf(false) }
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -147,7 +159,10 @@ private fun RowItem() {
                     contentDescription = "PriorityColor"
                 )
 
-                RowItemContent(modifier = Modifier.weight(1f)) { overflow ->
+                RowItemContent(
+                    modifier = Modifier.weight(1f),
+                    isShowMoreClicked = isShowMoreClicked
+                ) { overflow ->
                     isOverflowing = overflow
                 }
 
@@ -160,11 +175,19 @@ private fun RowItem() {
                 )
             }
 
-            if (isOverflowing) {
+            if (isOverflowing || isShowMoreClicked) {
                 Icon(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    imageVector = Icons.Default.ArrowDropDown,
+                        .fillMaxWidth()
+                        .clickable {
+                            isShowMoreClicked = !isShowMoreClicked
+                        }
+                    ,
+                    imageVector = if (isShowMoreClicked) {
+                        Icons.Default.ArrowDropUp
+                    }else {
+                        Icons.Default.ArrowDropDown
+                    },
                     contentDescription = "ArrowDropDown",
                     tint = colorResource(id = R.color.black500)
                 )
@@ -176,11 +199,21 @@ private fun RowItem() {
 }
 
 @Composable
-private fun RowItemContent(modifier: Modifier = Modifier, isOverflowing: (Boolean) -> Unit) {
+private fun RowItemContent(
+    modifier: Modifier = Modifier,
+    isShowMoreClicked: Boolean,
+    isOverflowing: (Boolean) -> Unit) {
+
+    val maxLines = if (isShowMoreClicked) {
+        Int.MAX_VALUE
+    } else {
+        2
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 8.dp, top = 4.dp),
+            .padding(start = 8.dp),
         verticalArrangement = Arrangement.Top
     ) {
         Text(
@@ -197,12 +230,12 @@ private fun RowItemContent(modifier: Modifier = Modifier, isOverflowing: (Boolea
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "Supporting line Supporting line Supporting line Supporting line Supporting line Supporting line",
+            text = " Supporting line  Supporting line  Supporting line  Supporting line  Supporting line  Supporting line ".trim(),
             style = TextStyle(
                 fontSize = 14.sp,
                 color = colorResource(id = R.color.brown500)
             ),
-            maxLines = 2,
+            maxLines = maxLines,
             overflow = TextOverflow.Ellipsis,
             onTextLayout = { textLayoutResult ->
                 isOverflowing.invoke(textLayoutResult.hasVisualOverflow)
@@ -213,6 +246,16 @@ private fun RowItemContent(modifier: Modifier = Modifier, isOverflowing: (Boolea
 
 @Composable
 private fun ToggleListIcon() {
+    var listIconToggleState by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    val imageVectorState = if (listIconToggleState) {
+        Icons.Filled.ViewModule
+    } else {
+        Icons.AutoMirrored.Filled.ViewList
+    }
+
     Row(
         modifier = Modifier
             .padding(end = 16.dp)
@@ -220,13 +263,29 @@ private fun ToggleListIcon() {
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            modifier = Modifier
-                .size(30.dp),
-            imageVector = Icons.AutoMirrored.Sharp.List,
-            contentDescription = "List",
-            tint = colorResource(id = R.color.brown500)
-        )
+        AnimatedContent(
+            targetState = imageVectorState,
+            transitionSpec = {
+                fadeIn(
+                    animationSpec = spring(stiffness = Spring.StiffnessLow)
+                ) togetherWith fadeOut(
+                    animationSpec = spring(stiffness = Spring.StiffnessLow)
+                )
+            },
+            label = ""
+        ) { targetIcon ->
+            Icon(
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable {
+                        listIconToggleState = !listIconToggleState
+                    }
+                ,
+                imageVector = targetIcon,
+                contentDescription = "List",
+                tint = colorResource(id = R.color.brown500)
+            )
+        }
     }
 }
 
