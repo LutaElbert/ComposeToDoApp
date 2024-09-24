@@ -1,12 +1,12 @@
 package com.group.composetodoapp.screens.homepage
 
-import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -36,6 +38,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,6 +54,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,6 +77,7 @@ fun Homepage() {
 fun MainContent(modifier: Modifier = Modifier) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val toggleListState = rememberSaveable { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier
@@ -96,22 +101,49 @@ fun MainContent(modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ToggleListIcon()
+                ToggleListIcon(toggleListState)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                LazyColumn {
-                    items(10) {
-                        RowItem()
-                    }
-                }
+                DisplayList(state = toggleListState)
             }
         }
     }
 }
 
 @Composable
-private fun RowItem() {
+private fun DisplayList(state: MutableState<Boolean>) {
+    if (state.value) {
+        StaggeredGrid(state)
+    } else {
+        VerticalList()
+    }
+}
+
+@Composable
+private fun VerticalList() {
+    LazyColumn {
+        items(10) {
+            RowItem()
+        }
+    }
+}
+
+@Composable
+fun StaggeredGrid(state: MutableState<Boolean>) {
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Fixed(2),
+        verticalItemSpacing = 8.dp,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(10) {
+            RowItem(state)
+        }
+    }
+}
+
+@Composable
+private fun RowItem(isStaggeredGrid: MutableState<Boolean> = mutableStateOf(false)) {
     var isOverflowing by rememberSaveable { mutableStateOf(false) }
     var isShowMoreClicked by rememberSaveable { mutableStateOf(false) }
 
@@ -143,19 +175,24 @@ private fun RowItem() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                Image(
+                Box(
                     modifier = Modifier
-                        .size(56.dp)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .clip(RoundedCornerShape(16.dp)),
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = "PriorityColor"
-                )
+                        .size(if (isStaggeredGrid.value) { 30.dp } else { 56.dp })
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .border(
+                                width = 2.dp,
+                                color = MaterialTheme.colorScheme.outline,
+                                shape = RoundedCornerShape(15.dp)
+                            )
+                            .clip(RoundedCornerShape(15.dp)),
+                        painter = painterResource(id = R.drawable.ic_launcher_background),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = "PriorityColor"
+                    )
+                }
 
                 RowItemContent(
                     modifier = Modifier.weight(1f),
@@ -245,15 +282,11 @@ private fun RowItemContent(
 }
 
 @Composable
-private fun ToggleListIcon() {
-    var listIconToggleState by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    val imageVectorState = if (listIconToggleState) {
-        Icons.Filled.ViewModule
-    } else {
+private fun ToggleListIcon(state: MutableState<Boolean>) {
+    val imageVectorState = if (state.value) {
         Icons.AutoMirrored.Filled.ViewList
+    } else {
+        Icons.Filled.ViewModule
     }
 
     Row(
@@ -271,7 +304,7 @@ private fun ToggleListIcon() {
                 modifier = Modifier
                     .size(30.dp)
                     .clickable {
-                        listIconToggleState = !listIconToggleState
+                        state.value = !state.value
                     },
                 imageVector = targetState,
                 contentDescription = "List",
@@ -351,13 +384,12 @@ fun SearchBox(modifier: Modifier = Modifier, onToggleClicked: () -> Unit) {
 
 @Preview(
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    device = Devices.TABLET,
+//    uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
 fun HomepagePreview() {
-    ComposeToDoAppTheme(
-        darkTheme = true
-    ) {
+    ComposeToDoAppTheme() {
         Homepage()
     }
 }
