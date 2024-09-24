@@ -1,16 +1,9 @@
 package com.group.composetodoapp.screens.homepage
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateInt
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +31,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
@@ -50,7 +44,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -62,8 +55,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.group.composetodoapp.R
+import com.group.composetodoapp.component.AnimatedContentComponent
 import com.group.composetodoapp.component.NavigationDrawerComponent
 import com.group.composetodoapp.component.ScaffoldComponent
+import com.group.composetodoapp.component.ToDoAnimationState
+import com.group.composetodoapp.ui.theme.ComposeToDoAppTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -124,8 +120,10 @@ private fun RowItem() {
     Row(
         modifier = Modifier
             .wrapContentSize()
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.background)
             .border(
-                border = BorderStroke(1.dp, colorResource(id = R.color.beige500)),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                 shape = RoundedCornerShape(8.dp)
             )
             .fillMaxWidth(),
@@ -149,8 +147,8 @@ private fun RowItem() {
                     modifier = Modifier
                         .size(56.dp)
                         .border(
-                            width = 4.dp,
-                            color = colorResource(id = R.color.brown500),
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.onSurface,
                             shape = RoundedCornerShape(16.dp)
                         )
                         .clip(RoundedCornerShape(16.dp)),
@@ -171,28 +169,29 @@ private fun RowItem() {
                         .size(24.dp),
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = "More",
-                    tint = colorResource(id = R.color.brown500)
+                    tint = MaterialTheme.colorScheme.tertiary
                 )
             }
 
-            if (isOverflowing || isShowMoreClicked) {
-                Icon(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            isShowMoreClicked = !isShowMoreClicked
-                        }
-                    ,
-                    imageVector = if (isShowMoreClicked) {
-                        Icons.Default.ArrowDropUp
-                    }else {
-                        Icons.Default.ArrowDropDown
-                    },
-                    contentDescription = "ArrowDropDown",
-                    tint = colorResource(id = R.color.black500)
-                )
+            AnimatedContentComponent(state = isShowMoreClicked, animationState = ToDoAnimationState.ContainerAnimation) {
+                if (isOverflowing || isShowMoreClicked) {
+                    Icon(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                isShowMoreClicked = !isShowMoreClicked
+                            },
+                        imageVector = if (isShowMoreClicked) {
+                            Icons.Default.ArrowDropUp
+                        } else {
+                            Icons.Default.ArrowDropDown
+                        },
+                        contentDescription = "ArrowDropDown",
+                        tint = MaterialTheme.colorScheme.tertiary
+                    )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
     }
@@ -202,7 +201,8 @@ private fun RowItem() {
 private fun RowItemContent(
     modifier: Modifier = Modifier,
     isShowMoreClicked: Boolean,
-    isOverflowing: (Boolean) -> Unit) {
+    isOverflowing: (Boolean) -> Unit
+) {
 
     val maxLines = if (isShowMoreClicked) {
         Int.MAX_VALUE
@@ -217,10 +217,10 @@ private fun RowItemContent(
         verticalArrangement = Arrangement.Top
     ) {
         Text(
-            text = "Data Structure",
+            text = "Hugas plato",
             style = TextStyle(
                 fontSize = 18.sp,
-                color = colorResource(id = R.color.brown500)
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -230,10 +230,10 @@ private fun RowItemContent(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = " Supporting line  Supporting line  Supporting line  Supporting line  Supporting line  Supporting line ".trim(),
+            text = " kay pahugason man kay pahugason man kay pahugason man kay pahugason mankay pahugason man ".trim(),
             style = TextStyle(
                 fontSize = 14.sp,
-                color = colorResource(id = R.color.brown500)
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             ),
             maxLines = maxLines,
             overflow = TextOverflow.Ellipsis,
@@ -263,27 +263,19 @@ private fun ToggleListIcon() {
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AnimatedContent(
-            targetState = imageVectorState,
-            transitionSpec = {
-                fadeIn(
-                    animationSpec = spring(stiffness = Spring.StiffnessLow)
-                ) togetherWith fadeOut(
-                    animationSpec = spring(stiffness = Spring.StiffnessLow)
-                )
-            },
-            label = ""
-        ) { targetIcon ->
+        AnimatedContentComponent(
+            state = imageVectorState,
+            animationState = ToDoAnimationState.IconAnimation
+        ) { targetState ->
             Icon(
                 modifier = Modifier
                     .size(30.dp)
                     .clickable {
                         listIconToggleState = !listIconToggleState
-                    }
-                ,
-                imageVector = targetIcon,
+                    },
+                imageVector = targetState,
                 contentDescription = "List",
-                tint = colorResource(id = R.color.brown500)
+                tint = MaterialTheme.colorScheme.tertiary
             )
         }
     }
@@ -304,10 +296,10 @@ fun SearchBox(modifier: Modifier = Modifier, onToggleClicked: () -> Unit) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(65.dp),
+            .height(55.dp),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(Color.White),
-        border = BorderStroke(1.dp, colorResource(id = R.color.beige500))
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Row(
             modifier = Modifier
@@ -324,7 +316,7 @@ fun SearchBox(modifier: Modifier = Modifier, onToggleClicked: () -> Unit) {
                     },
                 imageVector = Icons.Default.Menu,
                 contentDescription = "Menu",
-                tint = colorResource(id = R.color.brown500)
+                tint = MaterialTheme.colorScheme.tertiary
             )
 
             BasicTextField(
@@ -346,7 +338,7 @@ fun SearchBox(modifier: Modifier = Modifier, onToggleClicked: () -> Unit) {
                             text = stringResource(id = R.string.search_placeholder),
                             style = TextStyle(
                                 fontSize = 16.sp,
-                                color = colorResource(id = R.color.beige500)
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         )
                     }
@@ -357,8 +349,15 @@ fun SearchBox(modifier: Modifier = Modifier, onToggleClicked: () -> Unit) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 fun HomepagePreview() {
-    Homepage()
+    ComposeToDoAppTheme(
+        darkTheme = true
+    ) {
+        Homepage()
+    }
 }

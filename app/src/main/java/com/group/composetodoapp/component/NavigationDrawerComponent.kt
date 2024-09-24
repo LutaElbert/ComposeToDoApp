@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
@@ -22,9 +23,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.group.composetodoapp.R
 import com.group.composetodoapp.model.NavigationItem
 import kotlinx.coroutines.launch
 
@@ -77,7 +76,7 @@ fun NavigationDrawerHeader(drawerState: DrawerState) {
                 label = {
                     Text(
                         text = item.title,
-                        color = colorResource(id = R.color.black500)
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 selected = index == selectedItemIndex.intValue,
@@ -93,14 +92,14 @@ fun NavigationDrawerHeader(drawerState: DrawerState) {
                             item.selectedIcon
                         } else item.unselectedIcon,
                         contentDescription = item.title,
-                        tint = colorResource(id = R.color.brown500)
+                        tint = MaterialTheme.colorScheme.tertiary
                     )
                 },
                 badge = {
                     item.badgeCount?.let {
                         Text(
                             text = item.badgeCount.toString(),
-                            color = colorResource(id = R.color.brown500)
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
                 },

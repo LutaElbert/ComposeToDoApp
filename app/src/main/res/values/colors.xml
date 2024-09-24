@@ -11,4 +11,10 @@
     <color name="brown500">#FFB17457</color>
     <color name="black500">#FF4A4947</color>
     <color name="beige500">#FFD8D2C2</color>
+
+    <color name="night">#092635</color>
+    <color name="dark">#1B4242</color>
+    <color name="sea">#5C8374</color>
+    <color name="winter">#9EC8B9</color>
+
 </resources>
