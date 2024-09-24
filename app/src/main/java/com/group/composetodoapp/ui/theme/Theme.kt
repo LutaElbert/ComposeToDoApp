@@ -43,8 +43,11 @@ private val DarkColorScheme2 = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = Brown500,
     secondary = Black500,
-    tertiary = Beige500,
+    onSecondaryContainer = Black500,
+    tertiary = Brown500,
     background = Color.White,
+    outline = Beige500,
+    surfaceVariant = Color.White,
 
     /* Other default colors to override
     surface = Color(0xFFFFFBFE),

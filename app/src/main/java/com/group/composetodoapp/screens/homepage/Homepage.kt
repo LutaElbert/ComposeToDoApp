@@ -148,7 +148,7 @@ private fun RowItem() {
                         .size(56.dp)
                         .border(
                             width = 2.dp,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.outline,
                             shape = RoundedCornerShape(16.dp)
                         )
                         .clip(RoundedCornerShape(16.dp)),
@@ -338,7 +338,7 @@ fun SearchBox(modifier: Modifier = Modifier, onToggleClicked: () -> Unit) {
                             text = stringResource(id = R.string.search_placeholder),
                             style = TextStyle(
                                 fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         )
                     }

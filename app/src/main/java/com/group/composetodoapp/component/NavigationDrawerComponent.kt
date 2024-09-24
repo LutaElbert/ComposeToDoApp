@@ -76,7 +76,7 @@ fun NavigationDrawerHeader(drawerState: DrawerState) {
                 label = {
                     Text(
                         text = item.title,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 },
                 selected = index == selectedItemIndex.intValue,
